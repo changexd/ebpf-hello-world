@@ -1,3 +1,4 @@
+// Our "Loader Program"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -44,25 +45,30 @@ int main(void)
 		return 1;
 	}
 
-
+    // <name>_bpf__open() etc. are generated skeleton that abstracts libbpf api call
+       
+    //creates and opens BPF application (<name> stands for the specific bpf object name)
 	obj = hello_bpf__open();
 	if (!obj) {
 		fprintf(stderr, "failed to open and/or load BPF object\n");
 		return 1;
 	}
 
+    // load and verify BPF application
 	err = hello_bpf__load(obj);
 	if (err) {
 		fprintf(stderr, "failed to load BPF object %d\n", err);
 		goto cleanup;
 	}
 
+    // Attack bpf program that is "auto attachable"
 	err = hello_bpf__attach(obj);
 	if (err) {
 		fprintf(stderr, "failed to attach BPF programs\n");
 		goto cleanup;
 	}
 
+    // Running the bpf 
 	read_trace_pipe();
 
 cleanup:

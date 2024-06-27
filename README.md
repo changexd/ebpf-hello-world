@@ -12,6 +12,7 @@ First we need to make sure that the kernel we are using is configured to support
 
 We will need a static version of libbpf:
 ```
+## Installing required libbpf library
 $ git clone https://github.com/libbpf/libbpf && cd libbpf/src/
 $ make BUILD_STATIC_ONLY=1 OBJDIR=../build/libbpf DESTDIR=../build INCLUDEDIR=
  LIBDIR= UAPIDIR= install
@@ -19,8 +20,14 @@ $ make BUILD_STATIC_ONLY=1 OBJDIR=../build/libbpf DESTDIR=../build INCLUDEDIR=
  
 A short version of the build steps is provided here:
 ```
+## Dumping Kernel tracing data structure (requires enabling this feature in kernel) to our headerfile
+## BTF stands for (BPF Type Format)
 $ bpftool btf dump file /sys/kernel/btf/vmlinux format c > vmlinux.h
-$ clang -g -O2 -target bpf -D__TARGET_ARCH_x86_64 -I . -c hello.bpf.c -o hello.bpf.o
+
+## Building bpf program
+$ clang -g -O2 -target bpf -D__TARGET_ARCH_x86_64 -I . -c hello.bpf.c -o hello.bpf.o --include-dir "$LIBBPF_DIR"
+
+## [Skeleton](https://www.kernel.org/doc/html/latest/bpf/libbpf/libbpf_overview.html#bpf-object-skeleton-file)
 $ bpftool gen skeleton hello.bpf.o > hello.skel.h
 $ clang -g -O2 -Wall -I . -c hello.c -o hello.o
 $ clang -Wall -O2 -g hello.o libbpf/build/libbpf.a -lelf -lz -o hello

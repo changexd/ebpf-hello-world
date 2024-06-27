@@ -9,12 +9,14 @@ struct {
 	__type(value, struct event);
 } execs SEC(".maps");
 
+// SEC is a macro for libbpf
 SEC("tracepoint/syscalls/sys_enter_execve")
 int tracepoint__syscalls__sys_enter_execve(struct trace_event_raw_sys_enter *ctx)
 {
 	struct event *event;
 	pid_t pid;
 	u64 id;
+    // bpf_get_current_uid_gid -> kernel bpf helper function
 	uid_t uid = (u32) bpf_get_current_uid_gid();
 
 	id = bpf_get_current_pid_tgid();
